@@ -175,3 +175,5 @@ cython_debug/
 generated_projects/*
 # Exception: Keep the folder itself
 !generated_projects/.gitkeep
+
+.DS_Store
