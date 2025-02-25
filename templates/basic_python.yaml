@@ -1,0 +1,27 @@
+project_name: basic_python
+description: A simple Python project with a clean structure
+directories:
+  - src
+  - tests
+files:
+  .gitignore: |
+    __pycache__/
+    *.pyc
+  requirements.txt: |
+    # Add your dependencies here
+  src/main.py: |
+    def main():
+        print("Hello, World!")
+
+    if __name__ == "__main__":
+        main()
+  tests/test_main.py: |
+    import unittest
+    from src.main import main
+
+    class TestMain(unittest.TestCase):
+        def test_main(self):
+            self.assertIsNone(main())
+
+    if __name__ == "__main__":
+        unittest.main()
