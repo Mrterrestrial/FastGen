@@ -1,0 +1,109 @@
+project_name: php_web_project
+description: A PHP-based backend with HTML and CSS frontend.
+directories:
+  - public
+  - public/css
+  - public/js
+  - src
+  - src/controllers
+  - src/models
+  - src/views
+  - config
+  - tests
+
+files:
+  .gitignore: |
+    vendor/
+    .env
+    node_modules/
+    .DS_Store
+  composer.json: |
+    {
+      "name": "php_web_project",
+      "description": "A PHP web application with HTML and CSS frontend",
+      "require": {
+        "vlucas/phpdotenv": "^5.4",
+        "monolog/monolog": "^2.3"
+      },
+      "autoload": {
+        "psr-4": {
+          "App\\": "src/"
+        }
+      }
+    }
+  config/config.php: |
+    <?php
+    require_once __DIR__ . '/../vendor/autoload.php';
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+
+    define('APP_NAME', getenv('APP_NAME') ?: 'PHP Web App');
+  public/index.php: |
+    <?php
+    require_once __DIR__ . '/../config/config.php';
+    require_once __DIR__ . '/../src/controllers/HomeController.php';
+
+    use App\Controllers\HomeController;
+
+    $controller = new HomeController();
+    $controller->index();
+  src/controllers/HomeController.php: |
+    <?php
+    namespace App\Controllers;
+    
+    class HomeController {
+        public function index() {
+            include __DIR__ . '/../views/home.php';
+        }
+    }
+  src/models/User.php: |
+    <?php
+    namespace App\Models;
+    
+    class User {
+        public $id;
+        public $name;
+        public $email;
+        
+        public function __construct($id, $name, $email) {
+            $this->id = $id;
+            $this->name = $name;
+            $this->email = $email;
+        }
+    }
+  src/views/home.php: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PHP Web App</title>
+        <link rel="stylesheet" href="/css/style.css">
+    </head>
+    <body>
+        <h1>Welcome to PHP Web App</h1>
+        <p>This is a simple PHP backend with HTML and CSS frontend.</p>
+    </body>
+    </html>
+  public/css/style.css: |
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 50px;
+    }
+    h1 {
+        color: #333;
+    }
+  tests/HomeControllerTest.php: |
+    <?php
+    use PHPUnit\Framework\TestCase;
+    use App\Controllers\HomeController;
+    
+    class HomeControllerTest extends TestCase {
+        public function testIndex() {
+            $this->expectOutputString("<h1>Welcome to PHP Web App</h1>");
+            $controller = new HomeController();
+            $controller->index();
+        }
+    }
