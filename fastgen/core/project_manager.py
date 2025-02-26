@@ -5,6 +5,8 @@ from rich.console import Console
 from rich.prompt import Confirm
 from fastgen.core.template_manager import load_template, fetch_available_templates
 from fastgen.core.cli_manager import get_input_with_default, validate_project_name, validate_project_type
+from time import sleep
+
 
 console = Console()
 
@@ -45,33 +47,35 @@ def create_project(project_type, project_name, use_git):
         project_path = os.path.join(GENERATED_PROJECTS_DIR, project_name)
         os.makedirs(project_path, exist_ok=True)
 
-        # Create necessary directories
-        for directory in template.get("directories", []):
-            dir_path = os.path.join(project_path, directory)
-            os.makedirs(dir_path, exist_ok=True)
-            console.print(f"[bold yellow]📁 Created directory: {dir_path}[/bold yellow]")
+        with console.status("[bold cyan]Creating Project...[/bold cyan]") as status:
+            # Create necessary directories
+            for directory in template.get("directories", []):
+                dir_path = os.path.join(project_path, directory)
+                os.makedirs(dir_path, exist_ok=True)
+                sleep(0.8)
+                console.print(f"[bold yellow]📁 Created directory: {dir_path}[/bold yellow]")
 
-        # Create and write files
-        for file_path, content in template.get("files", {}).items():
-            file_full_path = os.path.join(project_path, file_path)
-            file_dir = os.path.dirname(file_full_path)
+            # Create and write files
+            for file_path, content in template.get("files", {}).items():
+                file_full_path = os.path.join(project_path, file_path)
+                file_dir = os.path.dirname(file_full_path)
 
-            # Ensure the directory exists
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir, exist_ok=True)
+                # Ensure the directory exists
+                if not os.path.exists(file_dir):
+                    os.makedirs(file_dir, exist_ok=True)
 
-            # Write file content
-            with open(file_full_path, "w", encoding="utf-8") as file:
-                file.write(content)
+                # Write file content
+                with open(file_full_path, "w", encoding="utf-8") as file:
+                    file.write(content)
+                    sleep(0.8)
+                console.print(f"[bold green]📝 Created file: {file_full_path}[/bold green]")
 
-            console.print(f"[bold green]📝 Created file: {file_full_path}[/bold green]")
+            # Initialize Git repository if selected
+            if use_git:
+                os.system(f"cd {project_path} && git init && git checkout -b main")
+                console.print(f"[bold green]🔧 Initialized Git repository in '{project_name}'[/bold green]")
 
-        # Initialize Git repository if selected
-        if use_git:
-            os.system(f"cd {project_path} && git init")
-            console.print(f"[bold green]🔧 Initialized Git repository in '{project_name}'[/bold green]")
-
-        console.print(f"[bold green]✅ Project '{project_name}' generated successfully! 🎉[/bold green]")
+            console.print(f"[bold green]✅ Project '{project_name}' generated successfully! 🎉[/bold green]")
 
     except Exception as e:
         console.print(f"[bold red]❌ Unexpected Error: {e}[/bold red]")
